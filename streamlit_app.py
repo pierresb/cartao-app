@@ -14,7 +14,7 @@ import streamlit as st
 # =========================
 st.set_page_config(
     page_title="Solicitação de Cartão Empresarial",
-    page_icon="assets/caixa_logo.png",  # troque por "💳" se preferir
+    page_icon="💳",
     layout="wide"
 )
 
