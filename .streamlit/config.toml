@@ -1,11 +1,10 @@
-# .streamlit/config.toml
 [theme]
 base="light"
-primaryColor="#005CA9"           # Azul Caixa
-backgroundColor="#FFFFFF"         # Fundo
+primaryColor="#005CA9"            # Azul Caixa
+backgroundColor="#FFFFFF"
 secondaryBackgroundColor="#F4F7FC" # Cartões/containers
-textColor="#1B1F23"               # Texto principal
-font="sans serif"                 # Use CSS p/ tipografia custom
+textColor="#1B1F23"
+font="sans serif"
 
 [browser]
 gatherUsageStats = false
