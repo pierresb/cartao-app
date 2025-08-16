@@ -1,2 +1,3 @@
 streamlit==1.37.0
 pandas>=2.2.0
+# fpdf==1.7.2   # habilite se for gerar comprovante em PDF futuramente
