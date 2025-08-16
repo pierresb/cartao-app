@@ -14,18 +14,21 @@ import streamlit as st
 # =========================
 st.set_page_config(
     page_title="Solicitação de Cartão Empresarial",
-    page_icon="assets/caixa_logo.png",  # troque por emoji "💳" se preferir
+    page_icon="assets/caixa_logo.png",  # troque por "💳" se preferir
     layout="wide"
 )
 
 ########################################
 # Branding CAIXA: cores, header e CSS  #
 ########################################
+# Referência institucional: Futura (manual da marca).
+# Substituímos por Montserrat (semelhante e livre para web).
+# Cores: Azul CAIXA ~ #005CA9 (Pantone 293C), Laranja CAIXA ~ #F39200 (Pantone 151).
 CAIXA_BLUE   = "#005CA9"
 CAIXA_ORANGE = "#F39200"
 CAIXA_BG     = "#F4F7FC"
 
-# CSS base (oculta menu/rodapé padrão) + tipografia + detalhes de UI
+# CSS base (oculta menu/rodapé Streamlit) + tipografia + detalhes visuais
 st.markdown("""
 <style>
 #MainMenu {visibility: hidden;}
@@ -37,36 +40,68 @@ header {visibility: visible;}
 st.markdown(
     f"""
     <style>
+      /* Tipografia (substituto da Futura) */
       @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
       html, body, [class*="css"] {{
         font-family: 'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial !important;
       }}
-      .stTabs [data-baseweb="tab-list"] button {{ font-weight: 600; }}
-      .stButton>button {{
-        border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+
+      /* Cards/containers suaves no padrão do site */
+      .stTabs [data-baseweb="tab-list"] button {{
+        font-weight: 600;
       }}
-      .stButton>button:hover {{ border-color: {CAIXA_BLUE}; }}
-      [data-testid="stMetricValue"] {{ color: {CAIXA_BLUE} !important; font-weight: 700 !important; }}
+      .stTabs [data-baseweb="tab"] p {{ margin-top: .25rem; }}
+
+      /* Botões */
+      .stButton>button {{
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 2px rgba(0,0,0,.04);
+      }}
+      .stButton>button:hover {{
+        border-color: {CAIXA_BLUE};
+      }}
+
+      /* Métricas */
+      [data-testid="stMetricValue"] {{
+        color: {CAIXA_BLUE} !important;
+        font-weight: 700 !important;
+      }}
+
+      /* Alertas de elegibilidade */
       .ok   {{ color: #1b8a5a; font-weight:600; }}
       .warn {{ color: #b65c00; font-weight:600; }}
       .bad  {{ color: #b00020; font-weight:600; }}
+
+      /* Tag/etiqueta estilo gov/caixa */
       .tag {{
-        background: {CAIXA_BG}; color: {CAIXA_BLUE};
-        padding: .2rem .6rem; border-radius: .5rem; font-size: .85rem; border: 1px solid #E2E8F0;
+        background: {CAIXA_BG};
+        color: {CAIXA_BLUE};
+        padding: .25rem .65rem;
+        border-radius: .5rem;
+        font-size: .85rem;
+        border: 1px solid #E2E8F0;
       }}
-      /* Sidebar em gradiente azul Caixa */
+
+      /* Sidebar com faixa azul CAIXA */
       section[data-testid="stSidebar"] > div:first-child {{
-        background: linear-gradient(180deg, {CAIXA_BLUE} 0%, #014a87 100%); color: white;
+        background: linear-gradient(180deg, {CAIXA_BLUE} 0%, #014a87 100%);
+        color: white;
       }}
-      section[data-testid="stSidebar"] h2, 
-      section[data-testid="stSidebar"] p, 
+      section[data-testid="stSidebar"] h2,
+      section[data-testid="stSidebar"] p,
       section[data-testid="stSidebar"] label {{
         color: white !important;
       }}
-      /* Foco nos inputs */
+
+      /* Foco em inputs: anel azul */
       input:focus, textarea:focus, select:focus {{
-        outline: none !important; box-shadow: 0 0 0 3px rgba(0,92,169,.2) !important; border-color: {CAIXA_BLUE} !important;
+        outline: none !important;
+        box-shadow: 0 0 0 3px rgba(0,92,169,.2) !important;
+        border-color: {CAIXA_BLUE} !important;
       }}
+
+      /* Links */
       a {{ color: {CAIXA_BLUE}; text-decoration: none; }}
       a:hover {{ text-decoration: underline; }}
     </style>
@@ -145,7 +180,7 @@ def valida_email(s: str) -> bool:
 
 def valida_telefone(s: str) -> bool:
     dig = only_digits(s)
-    return 10 <= len(dig) <= 11  # DDD+numero (fixo/cel)
+    return 10 <= len(dig) <= 11  # DDD + número
 
 def to_money(v):
     if v is None or v == "":
@@ -260,7 +295,7 @@ with st.sidebar:
     st.caption("Preencha os dados para enviar sua solicitação. Campos * são obrigatórios.")
     admin_toggle = st.checkbox("🔐 Entrar em modo administrador")
     st.markdown("---")
-    st.markdown(f"<span class='tag'>Identidade visual Caixa</span>", unsafe_allow_html=True)
+    st.markdown(f"<span class='tag'>Identidade visual CAIXA</span>", unsafe_allow_html=True)
 
 # =========================
 # Abas (fluxo do formulário)
@@ -287,8 +322,6 @@ with tabs[0]:
             faturamento = st.number_input("Faturamento Mensal (R$) *", min_value=0.0, step=1000.0, format="%.2f")
             qtd_func = st.number_input("Quantidade de Funcionários", min_value=0, step=1)
             site = st.text_input("Site (opcional)", placeholder="https://")
-
-        # validação CNPJ
         if empresa_cnpj and not valida_cnpj(empresa_cnpj):
             st.warning("⚠️ CNPJ inválido. Verifique os dígitos.", icon="⚠️")
 
@@ -305,7 +338,6 @@ with tabs[1]:
             resp_cpf = st.text_input("CPF *", placeholder="___.___.___-__")
         with col3:
             cargo = st.text_input("Cargo *", placeholder="Sócio, Diretor, Contador...")
-
         if resp_cpf and not valida_cpf(resp_cpf):
             st.warning("⚠️ CPF inválido. Verifique os dígitos.", icon="⚠️")
 
@@ -320,14 +352,13 @@ with tabs[2]:
             qtde_cartoes = st.number_input("Quantidade de cartões *", min_value=1, step=1, value=1)
         with col3:
             vencimento = st.selectbox("Vencimento da fatura *", options=[1,5,10,15,20,25])
-
         col4, col5 = st.columns(2)
         with col4:
             adesao_pontos = st.checkbox("Adesão ao programa de pontos")
         with col5:
             participa_cred = st.checkbox("Participa de credenciamento e maquininhas")
 
-        # heurística simples de compatibilidade (limite × faturamento)
+        # Heurística simples de compatibilidade (limite × faturamento)
         if faturamento and limite:
             ratio = float(limite) / float(max(faturamento, 1))
             if ratio <= 0.3:
@@ -368,7 +399,7 @@ with tabs[4]:
             st.metric("Qtd. Cartões", int(qtde_cartoes) if qtde_cartoes else 0)
             st.metric("Vencimento", f"{vencimento} do mês" if vencimento else "-")
 
-        # validações adicionais
+        # Validações adicionais
         valid_email = (not resp_email) or valida_email(resp_email)
         valid_tel = (not resp_tel) or valida_telefone(resp_tel)
         if resp_email and not valid_email:
@@ -376,7 +407,7 @@ with tabs[4]:
         if resp_tel and not valid_tel:
             st.error("Telefone inválido.")
 
-        # regra para habilitar o envio
+        # Regra para habilitar o envio
         can_submit = all([
             empresa_razao, empresa_cnpj, ramo, faturamento is not None,
             resp_nome, resp_email, resp_tel, resp_cpf, cargo,
@@ -388,7 +419,7 @@ with tabs[4]:
         submit = st.button("📨 Enviar solicitação", use_container_width=True, disabled=not can_submit)
 
         if submit:
-            # salva uploads (se fornecidos)
+            # Salva uploads (se fornecidos)
             def save_if(x, prefix):
                 return save_file(x, prefix) if x else None
 
@@ -439,7 +470,7 @@ with tabs[4]:
                 }
             }
 
-            # persistir
+            # Persistir
             sid = salvar_solicitacao(payload)
             protocolo = f"{datetime.now().strftime('%Y%m%d')}-{sid:06d}"
             payload["protocolo_preview"] = protocolo
