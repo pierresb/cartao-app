@@ -1,6 +1,4 @@
---- a/app.py
-+++ b/app.py
-@@ -1,12 +1,12 @@
+
  # -*- coding: utf-8 -*-
  import os
  import json
