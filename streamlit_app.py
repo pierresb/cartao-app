@@ -426,4 +426,62 @@ with tabs[4]:
                     "contrato_social": path_contrato,
                     "cartao_cnpj": path_cnpj,
                     "comprovante_endereco": path_end,
-                    "faturamento_ultimos":
+                    "faturamento_ultimos": path_fat
+                },
+                "consentimento": {
+                    "aceite": bool(aceite),
+                    "aceito_em": datetime.now().isoformat(timespec="seconds")
+                },
+                "status": "Recebida",
+                "meta": {
+                    "gerado_por": "Streamlit demo",
+                    "versao": "1.1.0-visual-caixa",
+                }
+            }
+
+            # persistir
+            sid = salvar_solicitacao(payload)
+            protocolo = f"{datetime.now().strftime('%Y%m%d')}-{sid:06d}"
+            payload["protocolo_preview"] = protocolo
+
+            st.success(f"✅ Solicitação recebida! Protocolo **{protocolo}**.")
+            st.toast("Solicitação registrada com sucesso.", icon="✅")
+
+            # Comprovante TXT para download
+            comp = make_receipt({
+                "Protocolo": protocolo,
+                "Data/Hora": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                "Razão Social": empresa_razao,
+                "CNPJ": empresa_cnpj,
+                "Responsável": resp_nome,
+                "E-mail": resp_email,
+                "Telefone": resp_tel,
+                "Limite Pretendido": to_money(limite),
+                "Qtd Cartões": qtde_cartoes,
+                "Vencimento": vencimento,
+                "Adesão Pontos": "Sim" if adesao_pontos else "Não",
+                "Participa Credenciamento": "Sim" if participa_cred else "Não",
+            })
+            st.download_button(
+                "⬇️ Baixar comprovante (TXT)",
+                data=comp,
+                file_name=f"comprovante_{protocolo}.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
+
+# =========================
+# Modo administrador (lista)
+# =========================
+admin_view = admin_toggle
+if admin_view:
+    st.markdown("---")
+    st.markdown("### 📋 Solicitações recebidas (local)")
+    df = listar_solicitacoes()
+    if df.empty:
+        st.info("Nenhuma solicitação registrada ainda.")
+    else:
+        df_fmt = df.copy()
+        if "LimitePretendido" in df_fmt.columns:
+            df_fmt["LimitePretendido"] = df_fmt["LimitePretendido"].apply(to_money)
+        st.dataframe(df_fmt, use_container_width=True, hide_index=True)
