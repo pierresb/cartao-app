@@ -1,8 +1,8 @@
 [theme]
 base="light"
-primaryColor="#005CA9"            # Azul Caixa
+primaryColor="#005CA9"             # Azul CAIXA (equivalente web ao Pantone 293C)
 backgroundColor="#FFFFFF"
-secondaryBackgroundColor="#F4F7FC" # Cartões/containers
+secondaryBackgroundColor="#F4F7FC" # Cartões claros como no site
 textColor="#1B1F23"
 font="sans serif"
 
