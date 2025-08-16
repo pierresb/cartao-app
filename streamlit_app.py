@@ -275,7 +275,7 @@ with left:
     try:
         st.image("assets/caixa_logo.png", width=140)
     except Exception:
-        st.markdown(f"<div style='color:{CAIXA_BLUE};font-weight:700'>CAIXA</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='color:{CAIXA_BLUE};font-weight:700'></div>", unsafe_allow_html=True)
 with right:
     st.markdown(
         f"""
